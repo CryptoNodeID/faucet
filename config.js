@@ -30,7 +30,7 @@ export default {
     },
     blockchains: [
         {
-            name: "empe-chain",
+            name: "empe-testnet-2",
             endpoint: {
                 // make sure that CORS is enabled in rpc section in config.toml
                 // cors_allowed_origins = ["*"]
@@ -53,7 +53,7 @@ export default {
                 fee: {
                     amount: [
                         {
-                            amount: "1",
+                            amount: "20",
                             denom: "uempe"
                         }
                     ],
