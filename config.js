@@ -25,7 +25,7 @@ export default {
     },
     project: {
         name: "CryptoNodeID Faucet",
-        logo: "https://github.com/CryptoNodeID/explorer/raw/master/public/CryptoNodeID.svg",
+        logo: "https://github.com/CryptoNodeID/explorer/raw/master/public/logo.svg",
         deployer: `<a href="https://cryptonode.id">CryptoNodeID</a>`
     },
     blockchains: [
