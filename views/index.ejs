@@ -6,7 +6,7 @@
     <title>Faucet for Cosmos SDK Blockchain</title>
     <link rel="icon" href="https://github.com/CryptoNodeID/explorer/raw/master/public/favicon.ico" />
     <meta name=”robots” content="index, follow">
-    <meta name="description" content="Uniform Faucet Tool For Cosmos SDK Blockchains - Powered By Ping.pub">
+    <meta name="description" content="Uniform Faucet Tool For Cosmos SDK Blockchains - Hosted By CryptoNode.ID Powered By Ping.pub">
     <meta></head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
   </head>
@@ -88,7 +88,7 @@
         methods: {
           onChange() {
             this.balance = {} // reset balance
-            fetch(`/balance/${this.chain}`).then(r => r.json()).then(balance => {
+            fetch(`/${this.chain}/balance`).then(r => r.json()).then(balance => {
               this.balance = balance
             })
           },
@@ -98,7 +98,7 @@
               obj.disabled = true
               document.getElementById("button-loading").style.display = 'block';
               
-              fetch(`/send/${this.chain}/${this.address}`).then(response => response.json()).then(data => {
+              fetch(`/${this.chain}/send/${this.address}`).then(response => response.json()).then(data => {
                   // button state
                   obj.disabled = false
                   document.getElementById("button-loading").style.display = 'none';
