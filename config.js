@@ -19,7 +19,7 @@ console.log(mnemonic)
 console.log("==================================================================")
 
 export default {
-    port: 8088, // http port
+    port: 58888, // http port
     db: {
         path: `${HOME}/history.db` // save request states
     },
