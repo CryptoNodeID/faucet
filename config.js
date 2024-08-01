@@ -24,13 +24,13 @@ export default {
         path: `${HOME}/history.db` // save request states
     },
     project: {
-        name: "Empeiria Faucet",
-        logo: "https://github.com/CryptoNodeID/explorer/blob/master/public/logos/empe.png?raw=true",
+        name: "CryptoNodeID Faucet",
+        logo: "https://github.com/CryptoNodeID/explorer/raw/master/public/CryptoNodeID.svg",
         deployer: `<a href="https://cryptonode.id">CryptoNodeID</a>`
     },
     blockchains: [
         {
-            name: "empe-testnet-2",
+            name: "empe",
             endpoint: {
                 // make sure that CORS is enabled in rpc section in config.toml
                 // cors_allowed_origins = ["*"]

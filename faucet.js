@@ -44,7 +44,7 @@ app.get('/config.json', async (req, res) => {
   res.send(project);
 })
 
-app.get('/balance/:chain', async (req, res) => {
+app.get('/:chain/balance', async (req, res) => {
   const { chain }= req.params
 
   let balance = {}
@@ -78,7 +78,7 @@ app.get('/balance/:chain', async (req, res) => {
   res.send(balance);
 })
 
-app.get('/send/:chain/:address', async (req, res) => {
+app.get('/:chain/send/:address', async (req, res) => {
   const {chain, address} = req.params;
   const ip = req.headers['cf-connecting-ip'] || req.headers['x-real-ip'] || req.headers['X-Forwarded-For'] || req.ip
   console.log('request tokens to ', address, ip)
@@ -160,7 +160,7 @@ async function sendEvmosTx(recipient, chain) {
           value:chainConf.tx.amount.amount
         }
       );
-   
+
     let repTx = {
       "code":0,
       "nonce":result["nonce"],
