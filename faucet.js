@@ -3,7 +3,7 @@ import * as path from 'path'
 
 import { Wallet } from '@ethersproject/wallet'
 import { pathToString } from '@cosmjs/crypto';
-import { ipRangeCheck } from"ip-range-check"
+import ipRangeCheck from "ip-range-check"
 
 import { ethers } from 'ethers'
 import { bech32 } from 'bech32';
@@ -77,6 +77,7 @@ app.get('/:chain/balance', async (req, res) => {
 })
 
 // read blocklist
+const fs = require('fs')
 const blocklist = []
 try{
   const vpns = JSON.parse(fs.readFileSync('./vpn.json', 'utf8'))
