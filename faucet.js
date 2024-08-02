@@ -3,8 +3,6 @@ import * as path from 'path'
 
 import { Wallet } from '@ethersproject/wallet'
 import { pathToString } from '@cosmjs/crypto';
-import ipRangeCheck from "ip-range-check"
-import axios from 'axios'
 
 import { ethers } from 'ethers'
 import { bech32 } from 'bech32';
@@ -77,15 +75,6 @@ app.get('/:chain/balance', async (req, res) => {
   res.send(balance);
 })
 
-// read blocklist
-const blocklist = []
-axios.get('https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/datacenter/ipv4.txt')
-  .then(res => blocklist.push(...res.data.split('\n')))
-  .catch(err => console.error(err))
-axios.get('https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/vpn/ipv4.txt')
-  .then(res => blocklist.push(...res.data.split('\n')))
-  .catch(err => console.error(err))
-
 // send tokens
 app.get('/:chain/send/:address', async (req, res) => {
   const {chain, address} = req.params;
@@ -95,10 +84,9 @@ app.get('/:chain/send/:address', async (req, res) => {
     try {
       const chainConf = conf.blockchains.find(x => x.name === chain)
       if (chainConf && (address.startsWith(chainConf.sender.option.prefix) || address.startsWith('0x'))) {
-        // check ip
-        const isBlocked = ipRangeCheck(ip, blocklist)
-        if (isBlocked) {
-          console.log('blocked ip', ip)
+
+        if ( await checker.checkVPN(ip) ) {
+          console.log('blocked ip, suspected vpn', ip)
           res.send({ result: 'ip is blocked, please disconnect your vpn'})
           return
         }else if( await checker.checkAddress(address, chain) && await checker.checkIp(`${chain}${ip}`, chain) ) {

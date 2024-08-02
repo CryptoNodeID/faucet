@@ -1,7 +1,17 @@
 import { Level } from "level";
+import ipRangeCheck from "ip-range-check"
+import axios from 'axios'
 
 const WINDOW = 86400 * 1000 // milliseconds in a day
 // const WINDOW = 20 * 1000 // 20s for test
+
+const blocklist = []
+axios.get('https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/datacenter/ipv4.txt')
+  .then(res => blocklist.push(...res.data.split('\n')))
+  .catch(err => console.error(err))
+axios.get('https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/vpn/ipv4.txt')
+  .then(res => blocklist.push(...res.data.split('\n')))
+  .catch(err => console.error(err))
 
 export class FrequencyChecker {
     constructor(conf) {
@@ -22,6 +32,11 @@ export class FrequencyChecker {
                 }
             });
         })
+    }
+
+    async checkVPN(ip) {
+        isBlocked = ipRangeCheck(ip, blocklist)
+        return isBlocked
     }
 
     async checkIp(ip, chain) {
