@@ -88,6 +88,33 @@ try{
 }
 
 // send tokens
+function ipCidrRange(cidr) {
+  let [ip, mask] = cidr.split('/');
+  let ipParts = ip.split('.').map(x => parseInt(x));
+  let max = 4;
+  let maskBin = Array.from({length: max}, () => '0').join('');
+  maskBin = maskBin.substr(0, max - mask) + Array.from({length: mask}, () => '1').join('');
+  let base = ipParts.map((num, i) => (num & parseInt(maskBin[i], 2)).toString()).join('.');
+  let decimal = ipParts.reduce((accu, num) => accu * 256 + num, 0);
+  let maxDecimal = (parseInt(256 ** (max - mask)) - 1) + decimal;
+  let ipMin = base;
+  let ipMax = base;
+  for (let i = max - 1; i >= 0; i--) {
+    let ipPart = parseInt(ipParts[i] | ~parseInt(maskBin[i], 2));
+    ipMax = ipPart.toString() + '.' + ipMax;
+    ipPart = parseInt(ipParts[i] & parseInt(maskBin[i], 2));
+    ipMin = ipPart.toString() + '.' + ipMin;
+  }
+  return {
+    contains: (ip) => {
+      let [ipMinimal, ...ipParts] = ip.split('.').map(x => parseInt(x));
+      let decimal = ipParts.reduce((accu, num) => accu * 256 + num, ipMinimal);
+      return decimal >= parseInt(ipMin.split('.').reduce((accu, num) => accu * 256 + num, ipMinimal), 10) &&
+        decimal <= parseInt(ipMax.split('.').reduce((accu, num) => accu * 256 + num, ipMinimal), 10);
+    }
+  }
+}
+
 app.get('/:chain/send/:address', async (req, res) => {
   const {chain, address} = req.params;
   const ip = req.headers['cf-connecting-ip'] || req.headers['x-real-ip'] || req.headers['X-Forwarded-For'] || req.ip
@@ -108,7 +135,6 @@ app.get('/:chain/send/:address', async (req, res) => {
           checker.update(`${chain}${ip}`) // get ::1 on localhost
           console.log('send tokens to ', address)
           sendTx(address, chain).then(ret => {
-
             checker.update(address)
             res.send({ result: ret })
           }).catch(err => {
