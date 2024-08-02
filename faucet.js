@@ -123,15 +123,16 @@ app.get('/:chain/send/:address', async (req, res) => {
     try {
       const chainConf = conf.blockchains.find(x => x.name === chain)
       if (chainConf && (address.startsWith(chainConf.sender.option.prefix) || address.startsWith('0x'))) {
-        for (const entry of blocklist) {
+        const isBlocked = blocklist.some(entry => {
           const range = ipCidrRange(entry);
-          if (range.contains(ip)) {
-            console.log('blocked ip', ip)
-            res.send({ result: 'ip is blocked, please disconnect your vpn'})
-            return
-          }
-        }
-        if( await checker.checkAddress(address, chain) && await checker.checkIp(`${chain}${ip}`, chain) ) {
+          return range.contains(ip);
+        });
+
+        if (isBlocked) {
+          console.log('blocked ip', ip)
+          res.send({ result: 'ip is blocked, please disconnect your vpn'})
+          return
+        }else if( await checker.checkAddress(address, chain) && await checker.checkIp(`${chain}${ip}`, chain) ) {
           checker.update(`${chain}${ip}`) // get ::1 on localhost
           console.log('send tokens to ', address)
           sendTx(address, chain).then(ret => {
