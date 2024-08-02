@@ -78,6 +78,16 @@ app.get('/:chain/balance', async (req, res) => {
   res.send(balance);
 })
 
+// read blocklist
+const blocklist = []
+try{
+  const vpns = JSON.parse(fs.readFileSync('vpn.json', 'utf8'))
+  blocklist.push(...vpns.blocklist.ip)
+}catch(err){
+  console.error(err)
+}
+
+// send tokens
 app.get('/:chain/send/:address', async (req, res) => {
   const {chain, address} = req.params;
   const ip = req.headers['cf-connecting-ip'] || req.headers['x-real-ip'] || req.headers['X-Forwarded-For'] || req.ip
@@ -86,6 +96,14 @@ app.get('/:chain/send/:address', async (req, res) => {
     try {
       const chainConf = conf.blockchains.find(x => x.name === chain)
       if (chainConf && (address.startsWith(chainConf.sender.option.prefix) || address.startsWith('0x'))) {
+        for (const entry of blocklist) {
+          const range = ipCidrRange(entry);
+          if (range.contains(ip)) {
+            console.log('blocked ip', ip)
+            res.send({ result: 'ip is blocked, please disconnect your vpn'})
+            return
+          }
+        }
         if( await checker.checkAddress(address, chain) && await checker.checkIp(`${chain}${ip}`, chain) ) {
           checker.update(`${chain}${ip}`) // get ::1 on localhost
           console.log('send tokens to ', address)
