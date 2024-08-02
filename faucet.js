@@ -3,6 +3,7 @@ import * as path from 'path'
 
 import { Wallet } from '@ethersproject/wallet'
 import { pathToString } from '@cosmjs/crypto';
+import { ipRangeCheck } from"ip-range-check"
 
 import { ethers } from 'ethers'
 import { bech32 } from 'bech32';
@@ -15,11 +16,8 @@ import { FrequencyChecker } from './checker.js';
 
 // load config
 console.log("loaded config: ", conf)
-
 const app = express()
-
 app.set("view engine", "ejs");
-
 const checker = new FrequencyChecker(conf)
 
 app.get('/', (req, res) => {
@@ -81,40 +79,13 @@ app.get('/:chain/balance', async (req, res) => {
 // read blocklist
 const blocklist = []
 try{
-  const vpns = JSON.parse(fs.readFileSync('vpn.json', 'utf8'))
+  const vpns = JSON.parse(fs.readFileSync('./vpn.json', 'utf8'))
   blocklist.push(...vpns.blocklist.ip)
 }catch(err){
   console.error(err)
 }
 
 // send tokens
-function ipCidrRange(cidr) {
-  let [ip, mask] = cidr.split('/');
-  let ipParts = ip.split('.').map(x => parseInt(x));
-  let max = 4;
-  let maskBin = Array.from({length: max}, () => '0').join('');
-  maskBin = maskBin.substr(0, max - mask) + Array.from({length: mask}, () => '1').join('');
-  let base = ipParts.map((num, i) => (num & parseInt(maskBin[i], 2)).toString()).join('.');
-  let decimal = ipParts.reduce((accu, num) => accu * 256 + num, 0);
-  let maxDecimal = (parseInt(256 ** (max - mask)) - 1) + decimal;
-  let ipMin = base;
-  let ipMax = base;
-  for (let i = max - 1; i >= 0; i--) {
-    let ipPart = parseInt(ipParts[i] | ~parseInt(maskBin[i], 2));
-    ipMax = ipPart.toString() + '.' + ipMax;
-    ipPart = parseInt(ipParts[i] & parseInt(maskBin[i], 2));
-    ipMin = ipPart.toString() + '.' + ipMin;
-  }
-  return {
-    contains: (ip) => {
-      let [ipMinimal, ...ipParts] = ip.split('.').map(x => parseInt(x));
-      let decimal = ipParts.reduce((accu, num) => accu * 256 + num, ipMinimal);
-      return decimal >= parseInt(ipMin.split('.').reduce((accu, num) => accu * 256 + num, ipMinimal), 10) &&
-        decimal <= parseInt(ipMax.split('.').reduce((accu, num) => accu * 256 + num, ipMinimal), 10);
-    }
-  }
-}
-
 app.get('/:chain/send/:address', async (req, res) => {
   const {chain, address} = req.params;
   const ip = req.headers['cf-connecting-ip'] || req.headers['x-real-ip'] || req.headers['X-Forwarded-For'] || req.ip
@@ -123,11 +94,8 @@ app.get('/:chain/send/:address', async (req, res) => {
     try {
       const chainConf = conf.blockchains.find(x => x.name === chain)
       if (chainConf && (address.startsWith(chainConf.sender.option.prefix) || address.startsWith('0x'))) {
-        const isBlocked = blocklist.some(entry => {
-          const range = ipCidrRange(entry);
-          return range.contains(ip);
-        });
-
+        // check ip
+        const isBlocked = ipRangeCheck(ip, blocklist)
         if (isBlocked) {
           console.log('blocked ip', ip)
           res.send({ result: 'ip is blocked, please disconnect your vpn'})
