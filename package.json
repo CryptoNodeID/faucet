@@ -37,6 +37,7 @@
     "ethers": "^5.7.1",
     "evmosjs": "0.3.3",
     "express": "^4.18.2",
+    "ip-range-check": "^0.2.0",
     "level": "^8.0.0",
     "nodemodule": "^0.3.0"
   }
