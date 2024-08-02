@@ -35,7 +35,7 @@ export class FrequencyChecker {
     }
 
     async checkVPN(ip) {
-        isBlocked = ipRangeCheck(ip, blocklist)
+        const isBlocked = ipRangeCheck(ip, blocklist)
         return isBlocked
     }
 
