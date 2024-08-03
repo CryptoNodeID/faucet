@@ -87,6 +87,9 @@ app.get('/:chain/send/:address', async (req, res) => {
   if (chain || address ) {
     try {
       const chainConf = conf.blockchains.find(x => x.name === chain)
+      const addressNE = await checker.checkAddress(address, chain)
+      const ipNE = await checker.checkIp(`${chain}${ip}`, chain)
+
       if (chainConf && (address.startsWith(chainConf.sender.option.prefix) || address.startsWith('0x'))) {
         if ( await checker.checkVPN(ip) ) {
           console.log('blocked ip, suspected vpn', ip)
@@ -100,7 +103,7 @@ app.get('/:chain/send/:address', async (req, res) => {
           console.log('insufficient balance')
           res.send({ status:'error', result: 'Insufficient balance, please consider donating to address below', message: 'Insufficient balance, please consider donating to address below' })
           return
-        }else if( await checker.checkAddress(address, chain) && await checker.checkIp(`${chain}${ip}`, chain) ) {
+        }else if( addressNE && ipNE ) {
           checker.update(`${chain}${ip}`)
           console.log('send tokens to ', address)
           sendTx(address, chain).then(ret => {
@@ -109,7 +112,15 @@ app.get('/:chain/send/:address', async (req, res) => {
           }).catch(err => {
             res.send({ result: `err: ${err}`})
           });
-        }else {
+        }else if ( (!addressNE && ipNE) || (addressNE && !ipNE) ) {
+          if ( !addressNE && ipNE ) {
+            checker.update(`${chain}${ip}`)
+          }
+          if ( addressNE && !ipNE ) {
+            checker.update(address)
+          }
+          res.send({ status:'error', result: "Trying to cheat the system? Wait another 24H from now", message: "Trying to cheat the system? Wait another 24H from now" })
+        } else {
           res.send({ status:'error', result: "You requested too often", message: "You requested too often" })
         }
       } else {
