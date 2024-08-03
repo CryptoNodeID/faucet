@@ -82,7 +82,7 @@ export class FrequencyChecker {
         } catch(err) {
             console.log(err)
         }
-        if (balance > chainConf.tx.amount[0].amount+chainConf.tx.fee[0].amount) {
+        if (balance > chainConf.tx.amount[0].amount+chainConf.tx.fee.amount[0].amount) {
             return true
         }
     }
