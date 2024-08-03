@@ -1,7 +1,7 @@
 import { Level } from "level";
 import ipRangeCheck from "ip-range-check"
 import axios from 'axios'
-import conf from './config.js'
+import cfg from './config.js'
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Wallet } from '@ethersproject/wallet'
@@ -44,18 +44,20 @@ export class FrequencyChecker {
     }
 
     async checkTargetBalance(address, chain) {
-        const chainConf = conf.blockchains.find(x => x.name === chain)
+        let balance = {}
+        const chainConf = cfg.blockchains.find(x => x.name === chain)
         if (chainConf) {
             const target = address
-            const balance = await axios.get(chainConf.endpoint.api_endpoint + '/cosmos/bank/v1beta1/balances/' + target)
-            if (balance && balance.balances && balance.balances[0].amount >= chainConf.tx.amount[0].amount) {
-                return true
-            }
+            balance = await axios.get(chainConf.endpoint.api_endpoint + '/cosmos/bank/v1beta1/balances/' + target)
+            .then(res => res.data)
+        }
+        if (balance && balance.balances && balance.balances[0].amount >= chainConf.tx.amount[0].amount) {
+            return true
         }
     }
 
     async checkSourceBalance(chain) {
-        const chainConf = conf.blockchains.find(x => x.name === chain)
+        const chainConf = cfg.blockchains.find(x => x.name === chain)
         let balance = {}
         
         try{
