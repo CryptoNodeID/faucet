@@ -90,15 +90,15 @@ app.get('/:chain/send/:address', async (req, res) => {
       if (chainConf && (address.startsWith(chainConf.sender.option.prefix) || address.startsWith('0x'))) {
         if ( await checker.checkVPN(ip) ) {
           console.log('blocked ip, suspected vpn', ip)
-          res.send({ status:'error', message: 'ip is blocked, please disconnect your vpn'})
+          res.send({ status:'error', result: 'ip is blocked, please disconnect your vpn', message: 'ip is blocked, please disconnect your vpn'})
           return
         }else if( await checker.checkTargetBalance(address, chain) ) {
           console.log('already have balance')
-          res.send({ status:'error', message: 'You already have sufficient balance' })
+          res.send({ status:'error', result: 'You already have sufficient balance', message: 'You already have sufficient balance' })
           return
-        }else if( await checker.checkSourceBalance(chain) ) {
+        }else if( !await checker.checkSourceBalance(chain) ) {
           console.log('insufficient balance')
-          res.send({ status:'error', message: 'Insufficient balance, please consider donating to address below' })
+          res.send({ status:'error', result: 'Insufficient balance, please consider donating to address below', message: 'Insufficient balance, please consider donating to address below' })
           return
         }else if( await checker.checkAddress(address, chain) && await checker.checkIp(`${chain}${ip}`, chain) ) {
           checker.update(`${chain}${ip}`)
@@ -110,14 +110,14 @@ app.get('/:chain/send/:address', async (req, res) => {
             res.send({ result: `err: ${err}`})
           });
         }else {
-          res.send({ status:'error', result: null, message: "You requested too often" })
+          res.send({ status:'error', result: "You requested too often", message: "You requested too often" })
         }
       } else {
-        res.send({ status:'error',  result: null, message: `Address [${address}] is not supported.` })
+        res.send({ status:'error',  result: `Address [${address}] is not supported.`, message: `Address [${address}] is not supported.` })
       }
     } catch (err) {
       console.error(err);
-      res.send({ status:'error',  result: null, message: 'Failed, Please contact to admin.' })
+      res.send({ status:'error',  result: 'Failed, Please contact to admin.', message: 'Failed, Please contact to admin.' })
     }
 
   } else {
