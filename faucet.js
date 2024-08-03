@@ -45,6 +45,7 @@ app.get('/:chain/balance', async (req, res) => {
   const { chain }= req.params
 
   let balance = {}
+  let address = null
 
   try{
     const chainConf = conf.blockchains.find(x => x.name === chain)
@@ -59,7 +60,7 @@ app.get('/:chain/balance', async (req, res) => {
             amount:ethBlance.toString()
           }
         }).catch(e => console.error(e))
-        const address = wallet2.address
+        address = wallet2.address
 
       }else{
         const rpcEndpoint = chainConf.endpoint.rpc_endpoint;
@@ -69,7 +70,7 @@ app.get('/:chain/balance', async (req, res) => {
         await client.getBalance(firstAccount.address, chainConf.tx.amount[0].denom).then(x => {
           balance = x
         }).catch(e => console.error(e));
-        const address = firstAccount.address
+        address = firstAccount.address
       }
     }
   } catch(err) {
