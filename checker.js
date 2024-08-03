@@ -51,7 +51,7 @@ export class FrequencyChecker {
             balance = await axios.get(chainConf.endpoint.api_endpoint + '/cosmos/bank/v1beta1/balances/' + target)
             .then(res => res.data)
         }
-        if (balance && balance.balances && balance.balances[0].amount >= chainConf.tx.amount[0].amount) {
+        if (balance && balance.balances && parseInt(balance.balances[0].amount) >= parseInt(chainConf.tx.amount[0].amount)) {
             return true
         }
     }
@@ -84,7 +84,7 @@ export class FrequencyChecker {
         } catch(err) {
             console.log(err)
         }
-        if (balance > chainConf.tx.amount[0].amount+chainConf.tx.fee.amount[0].amount) {
+        if (parseInt(balance.amount) > parseInt(chainConf.tx.amount[0].amount) + parseInt(chainConf.tx.fee.amount[0].amount)) {
             return true
         }
     }
