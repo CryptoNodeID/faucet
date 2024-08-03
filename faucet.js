@@ -97,6 +97,7 @@ app.get('/:chain/send/:address', async (req, res) => {
           return
         }else if( await checker.checkTargetBalance(address, chain) ) {
           console.log('already have balance')
+          checker.update(`${chain}${ip}`)
           res.send({ status:'error', result: 'You already have sufficient balance', message: 'You already have sufficient balance' })
           return
         }else if( !await checker.checkSourceBalance(chain) ) {
