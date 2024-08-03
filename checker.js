@@ -56,6 +56,9 @@ export class FrequencyChecker {
                 balance = {}
             }
         }
+        if (balance && balance.balances && balance.balances.length === 0 && balance.pagination && balance.pagination.total === "0") {
+            return false
+        }
         if (balance && balance.balances && parseInt(balance.balances[0].amount) >= parseInt(chainConf.tx.amount[0].amount)) {
             return true
         }
