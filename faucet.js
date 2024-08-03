@@ -76,7 +76,7 @@ app.get('/:chain/balance', async (req, res) => {
   } catch(err) {
     console.log(err)
   }
-  res.send({ status:'ok', result: { address, ...balance}, message: 'success' });
+  res.send({ status:'ok', result: { address, balance: [balance]}, message: 'success' });
 })
 
 // send tokens
