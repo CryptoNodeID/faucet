@@ -42,7 +42,7 @@
       </main>
     
       <footer class="my-5 pt-5 text-muted text-center text-small">
-        <p class="my-2"> Faucet Address: {{ faucet }}, <br> Balance: {{ balance.amount }} {{balance.denom}}</p>
+        <p class="my-2"> Faucet Address: {{ result.address }} <br> Balance: {{ result.balance.amount }} {{result.balance.denom}}</p>
         <p class="mb-1">&copy; <%= new Date().getFullYear() %> Deployed By <%- project.deployer%></p>
         <ul class="list-inline">
           <li class="list-inline-item"><a href="https://github.com/ping-pub/">Powered by ping.pub</a></li>
