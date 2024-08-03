@@ -88,13 +88,20 @@ app.get('/:chain/send/:address', async (req, res) => {
     try {
       const chainConf = conf.blockchains.find(x => x.name === chain)
       if (chainConf && (address.startsWith(chainConf.sender.option.prefix) || address.startsWith('0x'))) {
-
         if ( await checker.checkVPN(ip) ) {
           console.log('blocked ip, suspected vpn', ip)
           res.send({ status:'error', message: 'ip is blocked, please disconnect your vpn'})
           return
+        }else if( await checker.checkTargetBalance(address, chain) ) {
+          console.log('already have balance')
+          res.send({ status:'error', message: 'You already have sufficient balance' })
+          return
+        }else if( await checker.checkSourceBalance(chain) ) {
+          console.log('insufficient balance')
+          res.send({ status:'error', message: 'Insufficient balance, please consider donating to address below' })
+          return
         }else if( await checker.checkAddress(address, chain) && await checker.checkIp(`${chain}${ip}`, chain) ) {
-          checker.update(`${chain}${ip}`) // get ::1 on localhost
+          checker.update(`${chain}${ip}`)
           console.log('send tokens to ', address)
           sendTx(address, chain).then(ret => {
             checker.update(address)
@@ -124,18 +131,14 @@ app.listen(conf.port, () => {
 })
 
 async function sendCosmosTx(recipient, chain) {
-  // const mnemonic = "surround miss nominee dream gap cross assault thank captain prosper drop duty group candy wealth weather scale put";
   const chainConf = conf.blockchains.find(x => x.name === chain) 
   if(chainConf) {
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(chainConf.sender.mnemonic, chainConf.sender.option);
     const [firstAccount] = await wallet.getAccounts();
 
-    // console.log("sender", firstAccount);
-
     const rpcEndpoint = chainConf.endpoint.rpc_endpoint;
     const client = await SigningStargateClient.connectWithSigner(rpcEndpoint, wallet);
 
-    // const recipient = "cosmos1xv9tklw7d82sezh9haa573wufgy59vmwe6xxe5";
     const amount = chainConf.tx.amount;
     const fee = chainConf.tx.fee;
     console.log("recipient", recipient, amount, fee);
