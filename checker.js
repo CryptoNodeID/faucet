@@ -55,10 +55,10 @@ export class FrequencyChecker {
     }
 
     async checkSourceBalance(chain) {
+        const chainConf = conf.blockchains.find(x => x.name === chain)
         let balance = {}
-
+        
         try{
-            const chainConf = conf.blockchains.find(x => x.name === chain)
             if(chainConf) {
                 if(chainConf.type === 'Ethermint') {
                     const ethProvider = new ethers.providers.JsonRpcProvider(chainConf.endpoint.evm_endpoint);
