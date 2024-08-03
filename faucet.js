@@ -91,26 +91,26 @@ app.get('/:chain/send/:address', async (req, res) => {
 
         if ( await checker.checkVPN(ip) ) {
           console.log('blocked ip, suspected vpn', ip)
-          res.send({ result: 'ip is blocked, please disconnect your vpn'})
+          res.send({ status:'error', message: 'ip is blocked, please disconnect your vpn'})
           return
         }else if( await checker.checkAddress(address, chain) && await checker.checkIp(`${chain}${ip}`, chain) ) {
           checker.update(`${chain}${ip}`) // get ::1 on localhost
           console.log('send tokens to ', address)
           sendTx(address, chain).then(ret => {
             checker.update(address)
-            res.send({ result: ret })
+            res.send({ status:'ok', result: ret })
           }).catch(err => {
             res.send({ result: `err: ${err}`})
           });
         }else {
-          res.send({ result: "You requested too often" })
+          res.send({ status:'error', result: null, message: "You requested too often" })
         }
       } else {
-        res.send({ result: `Address [${address}] is not supported.` })
+        res.send({ status:'error',  result: null, message: `Address [${address}] is not supported.` })
       }
     } catch (err) {
       console.error(err);
-      res.send({ result: 'Failed, Please contact to admin.' })
+      res.send({ status:'error',  result: null, message: 'Failed, Please contact to admin.' })
     }
 
   } else {
