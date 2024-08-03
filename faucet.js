@@ -52,12 +52,14 @@ app.get('/:chain/balance', async (req, res) => {
       if(chainConf.type === 'Ethermint') {
         const ethProvider = new ethers.providers.JsonRpcProvider(chainConf.endpoint.evm_endpoint);
         const wallet = Wallet.fromMnemonic(chainConf.sender.mnemonic, pathToString(chainConf.sender.option.hdPaths[0])).connect(ethProvider);
+        const wallet2 = Wallet.fromMnemonic(chainConf.sender.mnemonic, pathToString(chainConf.sender.option.hdPaths[0]));
         await wallet.getBalance().then(ethBlance => {
           balance = {
             denom:chainConf.tx.amount.denom,
             amount:ethBlance.toString()
           }
         }).catch(e => console.error(e))
+        const address = wallet2.address
 
       }else{
         const rpcEndpoint = chainConf.endpoint.rpc_endpoint;
@@ -67,12 +69,13 @@ app.get('/:chain/balance', async (req, res) => {
         await client.getBalance(firstAccount.address, chainConf.tx.amount[0].denom).then(x => {
           balance = x
         }).catch(e => console.error(e));
+        const address = firstAccount.address
       }
     }
   } catch(err) {
     console.log(err)
   }
-  res.send(balance);
+  res.send({ status:'ok', result: { address, ...balance}, message: 'success' });
 })
 
 // send tokens
