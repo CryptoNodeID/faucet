@@ -48,8 +48,13 @@ export class FrequencyChecker {
         const chainConf = cfg.blockchains.find(x => x.name === chain)
         if (chainConf) {
             const target = address
-            balance = await axios.get(chainConf.endpoint.api_endpoint + '/cosmos/bank/v1beta1/balances/' + target)
-            .then(res => res.data)
+            try {
+                balance = await axios.get(chainConf.endpoint.api_endpoint + '/cosmos/bank/v1beta1/balances/' + target)
+                .then(res => res.data)
+            } catch (err) {
+                console.error('Failed to fetch balance for ' + target + ' on ' + chain + ':', err)
+                balance = {}
+            }
         }
         if (balance && balance.balances && parseInt(balance.balances[0].amount) >= parseInt(chainConf.tx.amount[0].amount)) {
             return true
