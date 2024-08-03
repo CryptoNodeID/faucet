@@ -47,7 +47,7 @@ export class FrequencyChecker {
         const chainConf = conf.blockchains.find(x => x.name === chain)
         if (chainConf) {
             const target = address
-            const balance = await axios.get(chainConf.endpoint.rpc_endpoint + '/cosmos/bank/v1beta1/balances/' + target)
+            const balance = await axios.get(chainConf.endpoint.api_endpoint + '/cosmos/bank/v1beta1/balances/' + target)
             if (balance && balance.balances && balance.balances[0].amount >= chainConf.tx.amount[0].amount) {
                 return true
             }

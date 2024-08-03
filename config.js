@@ -35,6 +35,7 @@ export default {
                 // make sure that CORS is enabled in rpc section in config.toml
                 // cors_allowed_origins = ["*"]
                 rpc_endpoint: "https://empe-testnet-rpc.cryptonode.id",
+                api_endpoint: "https://empe-testnet-api.cryptonode.id"
             },
             sender: {
                 mnemonic,
