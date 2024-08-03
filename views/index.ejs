@@ -91,7 +91,7 @@
           onChange() {
             this.balance = {} // reset balance
             fetch(`/${this.chain}/balance`).then(r => r.json()).then(resp => {
-              this.balance = resp.result.balance
+              this.balance = resp.result
             })
           },
           requestToken(obj) {
