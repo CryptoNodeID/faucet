@@ -114,6 +114,7 @@ app.get('/:chain/send/:address', async (req, res) => {
             res.send({ result: `err: ${err}`})
           });
         }else if ( (!addressNE && ipNE) || (addressNE && !ipNE) ) {
+          console.log('Cheater', address, ip)
           if ( !addressNE && ipNE ) {
             checker.update(`${chain}${ip}`)
           }
