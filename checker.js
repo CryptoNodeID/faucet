@@ -44,30 +44,41 @@ export class FrequencyChecker {
     }
 
     async checkTargetBalance(address, chain) {
-        let balance = {}
         const chainConf = cfg.blockchains.find(x => x.name === chain)
-        if (chainConf) {
-            const target = address
-            try {
-                balance = await axios.get(chainConf.endpoint.api_endpoint + '/cosmos/bank/v1beta1/balances/' + target)
-                .then(res => res.data)
-            } catch (err) {
-                console.error('Failed to fetch balance for ' + target + ' on ' + chain + ':', err)
-                balance = {}
+        let balance = {}
+
+        try{
+            if(chainConf) {
+                if(chainConf.type === 'Ethermint') {
+                    const ethProvider = new ethers.providers.JsonRpcProvider(chainConf.endpoint.evm_endpoint);
+                    ethProvider.getBalance(address)
+                    .then(ethBalance => {
+                        balance = ethBalance
+                    })
+                    .catch(e => {console.error('Error querying balance:', e)});
+                }else{
+                    const rpcEndpoint = chainConf.endpoint.rpc_endpoint;
+                    const wallet = await DirectSecp256k1HdWallet.fromMnemonic(chainConf.sender.mnemonic, chainConf.sender.option);
+                    const client = await SigningStargateClient.connectWithSigner(rpcEndpoint, wallet);
+                    await client.getBalance(address, chainConf.tx.amount[0].denom).then(x => {
+                    balance = x
+                    }).catch(e => console.error(e));
+                }
             }
+        } catch(err) {
+            console.log(err)
         }
-        if (balance && balance.balances && balance.balances.length === 0 && balance.pagination && balance.pagination.total === "0") {
-            return false
-        }
-        if (balance && balance.balances && parseInt(balance.balances[0].amount) >= parseInt(chainConf.tx.amount[0].amount)) {
+        if (parseInt(balance.amount) >= parseInt(chainConf.tx.amount[0].amount)) {
             return true
+        } else {
+            return false
         }
     }
 
     async checkSourceBalance(chain) {
         const chainConf = cfg.blockchains.find(x => x.name === chain)
         let balance = {}
-        
+
         try{
             if(chainConf) {
                 if(chainConf.type === 'Ethermint') {
