@@ -7,7 +7,7 @@ import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Wallet } from '@ethersproject/wallet'
 import { pathToString } from '@cosmjs/crypto';
 
-const WINDOW = 86400 * 1000 // milliseconds in a day
+const WINDOW = 82800 * 1000 // milliseconds in a day
 
 const blocklist = []
 axios.get('https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/datacenter/ipv4.txt')
