@@ -93,8 +93,15 @@ app.get('/:chain/send/:address', async (req, res) => {
       if (chainConf && (address.startsWith(chainConf.sender.option.prefix) || address.startsWith('0x'))) {
         if ( await checker.checkVPN(ip) ) {
           console.log('blocked ip, suspected vpn', ip)
-          res.send({ status:'error', result: 'ip is blocked, please disconnect your vpn', message: 'ip is blocked, please disconnect your vpn'})
-          return
+          if ( !addressNE ) {
+            checker.update(address)
+            res.send({ status:'error', result: 'Trying to cheat the system with VPN?', message: 'Trying to cheat the system with VPN?'})
+            console.log("Cheat attempt with VPN", address)
+            return
+          } else {
+            res.send({ status:'error', result: 'IP is blocked, please disconnect your VPN', message: 'IP is blocked, please disconnect your VPN'})
+            return
+          }
         }else if( await checker.checkTargetBalance(address, chain) ) {
           console.log('already have balance')
           checker.update(`${chain}${ip}`)
@@ -114,7 +121,7 @@ app.get('/:chain/send/:address', async (req, res) => {
             res.send({ result: `err: ${err}`})
           });
         }else if ( (!addressNE && ipNE) || (addressNE && !ipNE) ) {
-          console.log('Cheater', address, ip)
+          console.log('Cheat attempt detected!', address, ip)
           if ( !addressNE && ipNE ) {
             checker.update(`${chain}${ip}`)
           }
