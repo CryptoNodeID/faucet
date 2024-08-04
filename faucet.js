@@ -95,6 +95,7 @@ app.get('/:chain/send/:address', async (req, res) => {
           console.log('blocked ip, suspected vpn', ip)
           if ( !addressNE ) {
             checker.update(address)
+            checker.update(`${chain}${ip}`)
             res.send({ status:'error', result: 'Trying to cheat the system with VPN?', message: 'Trying to cheat the system with VPN?'})
             console.log("Cheat attempt with VPN", address)
             return
