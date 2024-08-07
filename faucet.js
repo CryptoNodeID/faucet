@@ -1,5 +1,4 @@
 import express from 'express';
-import * as path from 'path'
 
 import { Wallet } from '@ethersproject/wallet'
 import { pathToString } from '@cosmjs/crypto';
@@ -82,15 +81,18 @@ app.get('/:chain/balance', async (req, res) => {
 // send tokens
 app.get('/:chain/send/:address', async (req, res) => {
   const {chain, address} = req.params;
+  const body = await req.formData();
+  const token = body.get('cf-turnstile-response');
   const ip = req.headers['cf-connecting-ip'] || req.headers['x-real-ip'] || req.headers['X-Forwarded-For'] || req.ip
   console.log('request tokens to ', address, ip)
   if (chain || address ) {
     try {
+      const captchaValid = await checker.validateCaptcha(token,ip)
       const chainConf = conf.blockchains.find(x => x.name === chain)
       const addressNE = await checker.checkAddress(address, chain)
       const ipNE = await checker.checkIp(`${chain}${ip}`, chain)
 
-      if (chainConf && (address.startsWith(chainConf.sender.option.prefix) || address.startsWith('0x'))) {
+      if (chainConf && captchaValid && (address.startsWith(chainConf.sender.option.prefix) || address.startsWith('0x'))) {
         if ( await checker.checkVPN(ip) ) {
           console.log('blocked ip, suspected vpn', ip)
           if ( !addressNE ) {

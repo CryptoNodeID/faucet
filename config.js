@@ -12,6 +12,7 @@ if (!fs.existsSync(mnemonic_path)) {
         utils.entropyToMnemonic(utils.randomBytes(32))
       ).mnemonic.phrase)
 }
+const cfSecret = fs.readFileSync(`${HOME}/cf-secret.txt`, 'utf8')
 
 const mnemonic = fs.readFileSync(mnemonic_path, 'utf8')
 console.log("======================== faucet mnemonic =========================")
@@ -20,6 +21,7 @@ console.log("=================================================================="
 
 export default {
     port: 58888, // http port
+    cfSecret,
     db: {
         path: `${HOME}/history.db` // save request states
     },

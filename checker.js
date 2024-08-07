@@ -8,7 +8,7 @@ import { Wallet } from '@ethersproject/wallet'
 import { pathToString } from '@cosmjs/crypto';
 
 const WINDOW = 82800 * 1000 // milliseconds in a day
-
+const cfSecret = cfg.cfSecret
 const blocklist = []
 axios.get('https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/datacenter/ipv4.txt')
   .then(res => blocklist.push(...res.data.split('\n')))
@@ -21,6 +21,24 @@ export class FrequencyChecker {
     constructor(conf) {
         this.conf = conf
         this.db = new Level(conf.db.path, { valueEncoding: 'json' });
+    }
+
+    async validateCaptcha(token,ip) {
+        let formData = new FormData();
+        formData.append('secret', cfSecret);
+        formData.append('response', token);
+        formData.append('remoteip', ip);
+
+        const url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+        const result = await fetch(url, {
+            body: formData,
+            method: 'POST',
+        });
+
+        const outcome = await result.json();
+        if (outcome.success) {
+            return true
+        }
     }
 
     async check(key, limit) {
