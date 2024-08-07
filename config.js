@@ -47,7 +47,7 @@ export default {
                 amount: [
                     {
                         denom: "uempe",
-                        amount: "5000000"
+                        amount: "2500000"
                     },
                 ],
                 fee: {
