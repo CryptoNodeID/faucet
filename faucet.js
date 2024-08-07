@@ -89,7 +89,7 @@ app.get('/:chain/send/:address', async (req, res) => {
       const addressNE = await checker.checkAddress(address, chain)
       const ipNE = await checker.checkIp(`${chain}${ip}`, chain)
 
-      if (chainConf && captchaValid && (address.startsWith(chainConf.sender.option.prefix) || address.startsWith('0x'))) {
+      if (chainConf && (address.startsWith(chainConf.sender.option.prefix) || address.startsWith('0x'))) {
         if ( await checker.checkVPN(ip) ) {
           console.log('blocked ip, suspected vpn', ip)
           if ( !addressNE ) {
