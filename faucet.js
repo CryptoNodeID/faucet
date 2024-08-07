@@ -81,12 +81,10 @@ app.get('/:chain/balance', async (req, res) => {
 // send tokens
 app.get('/:chain/send/:address', async (req, res) => {
   const {chain, address} = req.params;
-  const token = req.body('cf-turnstile-response');
   const ip = req.headers['cf-connecting-ip'] || req.headers['x-real-ip'] || req.headers['X-Forwarded-For'] || req.ip
   console.log('request tokens to ', address, ip)
   if (chain || address ) {
     try {
-      const captchaValid = await checker.validateCaptcha(token,ip)
       const chainConf = conf.blockchains.find(x => x.name === chain)
       const addressNE = await checker.checkAddress(address, chain)
       const ipNE = await checker.checkIp(`${chain}${ip}`, chain)
