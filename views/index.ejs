@@ -34,7 +34,6 @@
                 </span>
                <span class="sr-only">Request Token</span>
               </button>
-              <div class="cf-turnstile" data-sitekey="0x4AAAAAAAghaHz_pNmFHqma" data-callback="javascriptCallback"></div>
           </div>
         </div>
   
@@ -43,6 +42,7 @@
       </main>
     
       <footer class="my-5 pt-5 text-muted text-center text-small">
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAAghaHz_pNmFHqma" data-callback="javascriptCallback"></div>
         <p class="my-2"> Faucet Address: {{ faucet }} <br> Balance: {{ balance.amount }} {{balance.denom}}</p>
         <p class="mb-1">&copy; <%= new Date().getFullYear() %> Deployed By <%- project.deployer%></p>
         <ul class="list-inline">
